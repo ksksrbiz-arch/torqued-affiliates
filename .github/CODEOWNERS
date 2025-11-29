@@ -1,0 +1,6 @@
+# Default owners
+* @KeithJohnSkaggsJr
+
+# CI and infra
+.github/ @KeithJohnSkaggsJr
+/scripts/ @KeithJohnSkaggsJr
