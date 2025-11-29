@@ -1,3 +1,5 @@
+# Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
+# This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
 # Secure Secret Store Integration
 
 This backend can be configured to use a cloud secret manager for sensitive credentials (API keys, DB passwords, etc). Supported options:

@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
+// This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
 import { Router, Request } from 'express';
 import { verifyShopifyWebhook, getWebhookTopic } from '../services/shopifyService';
 

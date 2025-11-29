@@ -1,4 +1,8 @@
+# Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
+# This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
 # Torqued Affiliates — Backend
+
+Security: See `SECURITY.md` for our vulnerability reporting and response policy.
 
 Minimal, ready-to-extend Node.js + TypeScript backend for the Torqued Affiliates program.
 

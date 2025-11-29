@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
+// This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
 import express from 'express';
 import bodyParser from 'body-parser';
 import healthRouter from './routes/health';

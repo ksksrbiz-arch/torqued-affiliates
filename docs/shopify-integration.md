@@ -1,3 +1,5 @@
+# Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
+# This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
 # Shopify Integration Guide (Backend)
 
 This backend repository provides API endpoints and webhooks intended to integrate with a Shopify-hosted frontend (store or app). The front-end will be deployed on Shopify and communicate with this API.

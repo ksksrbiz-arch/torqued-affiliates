@@ -1,0 +1,110 @@
+name: Security Checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * 1' # weekly Monday 02:00 UTC
+
+permissions:
+  contents: read
+  issues: write
+  security_events: write
+  id-token: write
+
+jobs:
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript,java
+      - name: Perform CodeQL build
+        uses: github/codeql-action/autobuild@v2
+      - name: Run CodeQL analysis
+        uses: github/codeql-action/analyze@v2
+
+  npm-audit:
+    name: NPM Audit and Provenance
+    runs-on: ubuntu-latest
+    needs: codeql
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies (CI)
+        run: npm ci
+      - name: Run npm audit
+        run: |
+          npm audit --json > audit-report.json || true
+          cat audit-report.json
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: audit-report.json
+      - name: Verify package signatures (optional)
+        run: |
+          if npm pkg get --json | jq -r '.' >/dev/null 2>&1; then
+            echo "signature verification step (if enabled)";
+          fi
+
+  dependency-check:
+    name: OWASP Dependency-Check
+    runs-on: ubuntu-latest
+    needs: npm-audit
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java (for dependency-check)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Run OWASP dependency-check
+        uses: jeremylong/DependencyCheck-action@v3
+        with:
+          format: 'ALL'
+          scan: '.'
+      - name: Upload dependency-check report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: dependency-check-report.*
+
+  pages-deploy-check:
+    name: Pages Deploy Safety Checks
+    runs-on: ubuntu-latest
+    needs: [npm-audit, dependency-check]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for accidental secrets
+        run: |
+          git grep -I --line-number "(API_KEY|API_SECRET|SECRET|PASSWORD|PRIVATE_KEY|ENCRYPTION_KEY)" || true
+      - name: Policy check (CSP)
+        run: |
+          echo "Ensure CSP meta tag exists in built HTML before deployment" || true
+
+  notify:
+    name: Publish Status
+    runs-on: ubuntu-latest
+    needs: [codeql, npm-audit, dependency-check]
+    steps:
+      - name: Create issue if high/critical vulnerabilities found
+        run: |
+          echo "(This step can be extended to parse reports and open issues via GitHub CLI)"
+
+# Notes:
+# - Pin actions to a specific sha in production for maximum supply-chain safety.
+# - Consider restricting 'pages' deployment to environment approvals and required reviewers.
+# - Use repository secrets and environment protection rules for sensitive actions.

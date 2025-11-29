@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
+// This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';

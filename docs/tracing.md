@@ -1,3 +1,5 @@
+# Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
+# This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
 # Tracing / OpenTelemetry — quick start
 
 This project includes an OpenTelemetry SDK initializer (`src/tracing.ts`) that will automatically instrument the Node.js runtime and export traces to an OTLP endpoint.

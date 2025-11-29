@@ -1,3 +1,5 @@
+# Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
+# This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
 # Dev Docker Compose
 
 Bring up a full local development environment (app, Postgres, MongoDB, OTEL collector, Jaeger UI):

@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
+// This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
 // Initialize tracing first so the SDK instruments modules used by the app.
 import './tracing';
 import app from './app';
