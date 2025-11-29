@@ -22,13 +22,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v4
         with:
           languages: javascript,java
       - name: Perform CodeQL build
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@v4
       - name: Run CodeQL analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v4
 
   npm-audit:
     name: NPM Audit and Provenance
