@@ -13,13 +13,13 @@ Quick start
 npm install
 ```
 
-3. Start developer server:
+1. Start developer server:
 
 ```pwsh
 npm run dev
 ```
 
-4. Run tests:
+2. Run tests:
 
 ```pwsh
 npm test
