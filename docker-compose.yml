@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  app:
+    image: node:18
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app:cached
+      - /usr/src/app/node_modules
+    ports:
+      - '4000:4000'
+    environment:
+      - NODE_ENV=development
+      - DATABASE_TYPE=postgres
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/torqued_affiliates
+      - MONGO_DB=torqued_affiliates
+      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      - SHOPIFY_API_SECRET=${SHOPIFY_API_SECRET}
+      - SHOPIFY_REDIRECT_URI=${SHOPIFY_REDIRECT_URI}
+      - OTLP_ENDPOINT=http://otel-collector:4319/v1/traces
+    command: sh -c "npm ci && npm run dev"
+    depends_on:
+      - postgres
+      - mongo
+      - otel-collector
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: torqued_affiliates
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_DATABASE: torqued_affiliates
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodata:/data/db
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config", "/etc/otel-config.yaml"]
+    volumes:
+      - ./otel-config.yaml:/etc/otel-config.yaml:ro
+    ports:
+      - '4319:4319'
+      - '4318:4318'
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.46
+    ports:
+      - '16686:16686'
+      - '6831:6831/udp'
+
+volumes:
+  pgdata:
+  mongodata:
