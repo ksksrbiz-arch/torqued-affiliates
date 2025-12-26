@@ -3,12 +3,13 @@
 // Initialize tracing first so the SDK instruments modules used by the app.
 import './tracing';
 import app from './app';
-import { config } from './config';
+import { config, validateConfig } from './config';
 import { createDbClient } from './db';
 
 const port = process.env.PORT || config.PORT || 4000;
 
 (async () => {
+  validateConfig();
   // Connect to DB if configured (noop for memory)
   const db = await createDbClient();
   await db.connect();
