@@ -15,8 +15,12 @@ const sdk = new NodeSDK({
   instrumentations: [getNodeAutoInstrumentations()]
 });
 
-sdk.start();
-console.info('OpenTelemetry SDK started — exporting to', endpoint);
+try {
+  sdk.start();
+  console.info('OpenTelemetry SDK started — exporting to', endpoint);
+} catch (err: unknown) {
+  console.error('Error starting OpenTelemetry SDK', err);
+}
 
 // Graceful shutdown on termination signals
 process.on('SIGTERM', () => {
