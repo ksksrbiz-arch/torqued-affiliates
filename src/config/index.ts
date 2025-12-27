@@ -29,12 +29,31 @@ if (process.env.AZURE_KEYVAULT_URI) {
 const allowedDatabaseTypes = ['memory', 'postgres', 'mongo'] as const;
 type DatabaseType = (typeof allowedDatabaseTypes)[number];
 
+function parseDatabaseType(value: string | undefined): DatabaseType {
+  const resolved = value || 'memory';
+  if (!allowedDatabaseTypes.includes(resolved as DatabaseType)) {
+    throw new Error(
+      `Invalid DATABASE_TYPE "${resolved}". Must be one of: ${allowedDatabaseTypes.join(', ')}.`
+    );
+  }
+  return resolved as DatabaseType;
+}
+
+function parsePort(value: string | undefined): number {
+  if (!value) return 4000;
+  const parsed = parseInt(value, 10);
+  if (isNaN(parsed) || parsed <= 0) {
+    throw new Error(`Invalid PORT "${value}". Must be a positive integer.`);
+  }
+  return parsed;
+}
+
 export const config = {
-  PORT: process.env.PORT ? Number(process.env.PORT) : 4000,
+  PORT: parsePort(process.env.PORT),
   NODE_ENV: process.env.NODE_ENV || 'development',
   APP_SECRET: process.env.APP_SECRET || 'dev-secret',
   DATABASE_URL: process.env.DATABASE_URL || '',
-  DATABASE_TYPE: (process.env.DATABASE_TYPE || 'memory') as DatabaseType,
+  DATABASE_TYPE: parseDatabaseType(process.env.DATABASE_TYPE),
   MONGO_DB: process.env.MONGO_DB || 'torqued_affiliates',
   SHOPIFY_API_KEY: process.env.SHOPIFY_API_KEY || '',
   SHOPIFY_API_SECRET: process.env.SHOPIFY_API_SECRET || '',
@@ -57,16 +76,18 @@ export function validateConfig(): void {
     errors.push(`DATABASE_URL is required when DATABASE_TYPE is ${config.DATABASE_TYPE}.`);
   }
 
+  if (config.NODE_ENV === 'production' && config.DATABASE_TYPE === 'mongo' && !process.env.MONGO_DB) {
+    errors.push('MONGO_DB must be explicitly set in production when DATABASE_TYPE is mongo.');
+  }
+
   if (config.NODE_ENV === 'production' && config.APP_SECRET === 'dev-secret') {
     errors.push('APP_SECRET must be set to a non-default value in production.');
   }
 
-  if (!config.SHOPIFY_API_KEY || !config.SHOPIFY_API_SECRET) {
-    warnings.push('SHOPIFY_API_KEY and SHOPIFY_API_SECRET should be set for Shopify integrations.');
-  }
-
   if (config.NODE_ENV === 'production' && (!config.SHOPIFY_API_KEY || !config.SHOPIFY_API_SECRET)) {
     errors.push('SHOPIFY_API_KEY and SHOPIFY_API_SECRET are required in production.');
+  } else if (!config.SHOPIFY_API_KEY || !config.SHOPIFY_API_SECRET) {
+    warnings.push('SHOPIFY_API_KEY and SHOPIFY_API_SECRET should be set for Shopify integrations.');
   }
 
   if (warnings.length > 0) {
