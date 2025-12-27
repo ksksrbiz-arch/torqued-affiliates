@@ -68,10 +68,6 @@ export function validateConfig(): void {
     errors.push('PORT must be a positive number.');
   }
 
-  if (!allowedDatabaseTypes.includes(config.DATABASE_TYPE)) {
-    errors.push(`DATABASE_TYPE must be one of: ${allowedDatabaseTypes.join(', ')}.`);
-  }
-
   if (config.DATABASE_TYPE !== 'memory' && !config.DATABASE_URL) {
     errors.push(`DATABASE_URL is required when DATABASE_TYPE is ${config.DATABASE_TYPE}.`);
   }
