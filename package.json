@@ -17,7 +17,7 @@
     "@opentelemetry/auto-instrumentations-node": "^0.34.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.56.0",
     "@opentelemetry/sdk-node": "^0.56.0",
-    "body-parser": "^1.20.2",
+    "body-parser": "^2.2.1",
     "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
     "express": "^4.21.2",
