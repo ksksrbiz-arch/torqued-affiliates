@@ -9,10 +9,10 @@ export type DbClient = {
 
 // Factory for DB client depending on DATABASE_TYPE
 export async function createDbClient(): Promise<DbClient> {
-  const type = process.env.DATABASE_TYPE || 'memory';
+  const type = config.DATABASE_TYPE;
   if (type === 'postgres') {
     const { Pool } = await import('pg');
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const pool = new Pool({ connectionString: config.DATABASE_URL });
 
     // Ensure table exists — minimal schema
     await pool.query(`
@@ -49,7 +49,7 @@ export async function createDbClient(): Promise<DbClient> {
     };
   } else if (type === 'mongo') {
     const mongoose = await import('mongoose');
-    await mongoose.connect(process.env.DATABASE_URL ?? '', { dbName: process.env.MONGO_DB || 'torqued_affiliates' });
+    await mongoose.connect(config.DATABASE_URL, { dbName: config.MONGO_DB });
     return {
       connect: async () => Promise.resolve(),
       disconnect: async () => mongoose.disconnect()
