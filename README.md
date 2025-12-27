@@ -38,9 +38,22 @@ What's included
 - docs/branch-sync.md — instructions for syncing branches from an existing repo into this new repo
 - docs/shopify-integration.md — tips for connecting a Shopify-hosted frontend to this backend
 
+Data storage and migrations
+
+- **Primary data store:** PostgreSQL (use `DATABASE_TYPE=postgres`).
+- **Migration strategy:** store SQL migrations in a `/migrations` folder and apply them with a migration runner (for example `node-pg-migrate`) as part of deploys. The current Postgres client still auto-creates the minimal tables for local dev only.
+
+Queues / Redis
+
+- Redis/BullMQ are **not required** for the baseline runtime. Add Redis + a queue only when you need background jobs or high-volume webhook processing.
+
+Secrets management
+
+- Azure Key Vault is the primary secret store option. Configure `AZURE_KEYVAULT_URI` and related credentials in `.env` (see `docs/secret-store.md`).
+
 Next steps
 
-- Implement persistent storage (Postgres, MongoDB or another store)
+- Extend PostgreSQL-based persistent storage (schemas, indices, and migrations)
 - Add real authentication and permissions
 - Add billing / webhooks verification for Shopify
 
