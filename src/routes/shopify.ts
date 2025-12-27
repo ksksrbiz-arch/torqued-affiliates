@@ -26,7 +26,7 @@ router.get('/proxy', (req: Request, res: Response) => {
 });
 
 // OAuth: redirect store owner to install page
-router.get('/install', (req: Request, res: Response) => {
+router.get('/install', async (req: Request, res: Response) => {
   const shop = req.query.shop as string | undefined;
   if (!shop) return res.status(400).send('shop query param required');
 
