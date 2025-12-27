@@ -26,14 +26,80 @@ if (process.env.AZURE_KEYVAULT_URI) {
   }
 }
 
+const allowedDatabaseTypes = ['memory', 'postgres', 'mongo'] as const;
+type DatabaseType = (typeof allowedDatabaseTypes)[number];
+
+function parseDatabaseType(value: string | undefined): DatabaseType {
+  const resolved = value || 'memory';
+  if (!allowedDatabaseTypes.includes(resolved as DatabaseType)) {
+    throw new Error(
+      `Invalid DATABASE_TYPE "${resolved}". Must be one of: ${allowedDatabaseTypes.join(', ')}.`
+    );
+  }
+  return resolved as DatabaseType;
+}
+
+function parsePort(value: string | undefined): number {
+  if (!value) return 4000;
+  const port = parseInt(value, 10);
+  if (isNaN(port)) {
+    throw new Error(`Invalid PORT "${value}". Must be a numeric value.`);
+  }
+  return port;
+  const parsed = parseInt(value, 10);
+  if (isNaN(parsed) || parsed <= 0) {
+    throw new Error(`Invalid PORT "${value}". Must be a positive integer.`);
+  }
+  return parsed;
+}
+
 export const config = {
-  PORT: process.env.PORT ? Number(process.env.PORT) : 4000,
+  PORT: parsePort(process.env.PORT),
   NODE_ENV: process.env.NODE_ENV || 'development',
   APP_SECRET: process.env.APP_SECRET || 'dev-secret',
   DATABASE_URL: process.env.DATABASE_URL || '',
+  DATABASE_TYPE: parseDatabaseType(process.env.DATABASE_TYPE),
+  MONGO_DB: process.env.MONGO_DB || 'torqued_affiliates',
   SHOPIFY_API_KEY: process.env.SHOPIFY_API_KEY || '',
   SHOPIFY_API_SECRET: process.env.SHOPIFY_API_SECRET || '',
   getSecret // async function, if available
 };
+
+export function validateConfig(): void {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!Number.isFinite(config.PORT) || config.PORT <= 0) {
+    errors.push('PORT must be a positive number.');
+  }
+
+  if (config.DATABASE_TYPE !== 'memory' && !config.DATABASE_URL) {
+    errors.push(`DATABASE_URL is required when DATABASE_TYPE is ${config.DATABASE_TYPE}.`);
+  }
+
+  if (config.DATABASE_TYPE === 'mongo' && !config.MONGO_DB) {
+    errors.push('MONGO_DB is required when DATABASE_TYPE is mongo.');
+  if (config.NODE_ENV === 'production' && config.DATABASE_TYPE === 'mongo' && !process.env.MONGO_DB) {
+    errors.push('MONGO_DB must be explicitly set in production when DATABASE_TYPE is mongo.');
+  }
+
+  if (config.NODE_ENV === 'production' && config.APP_SECRET === 'dev-secret') {
+    errors.push('APP_SECRET must be set to a non-default value in production.');
+  }
+
+  if (config.NODE_ENV === 'production' && (!config.SHOPIFY_API_KEY || !config.SHOPIFY_API_SECRET)) {
+    errors.push('SHOPIFY_API_KEY and SHOPIFY_API_SECRET are required in production.');
+  } else if (!config.SHOPIFY_API_KEY || !config.SHOPIFY_API_SECRET) {
+    warnings.push('SHOPIFY_API_KEY and SHOPIFY_API_SECRET should be set for Shopify integrations.');
+  }
+
+  if (warnings.length > 0) {
+    console.warn(`Config warnings:\n- ${warnings.join('\n- ')}`);
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Config validation failed:\n- ${errors.join('\n- ')}`);
+  }
+}
 
 // For GCP/AWS, see docs/secret-store.md for integration code snippets.
