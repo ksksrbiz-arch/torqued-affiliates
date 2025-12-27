@@ -79,6 +79,7 @@ export function validateConfig(): void {
 
   if (config.DATABASE_TYPE === 'mongo' && !config.MONGO_DB) {
     errors.push('MONGO_DB is required when DATABASE_TYPE is mongo.');
+  }
   if (config.NODE_ENV === 'production' && config.DATABASE_TYPE === 'mongo' && !process.env.MONGO_DB) {
     errors.push('MONGO_DB must be explicitly set in production when DATABASE_TYPE is mongo.');
   }
