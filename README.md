@@ -53,7 +53,7 @@ Secrets management
 
 Next steps
 
-- Implement persistent storage (Postgres, MongoDB or another store)
+- Extend PostgreSQL-based persistent storage (schemas, indices, and migrations)
 - Add real authentication and permissions
 - Add billing / webhooks verification for Shopify
 
