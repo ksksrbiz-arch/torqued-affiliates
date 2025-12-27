@@ -41,6 +41,11 @@ function parseDatabaseType(value: string | undefined): DatabaseType {
 
 function parsePort(value: string | undefined): number {
   if (!value) return 4000;
+  const port = parseInt(value, 10);
+  if (isNaN(port)) {
+    throw new Error(`Invalid PORT "${value}". Must be a numeric value.`);
+  }
+  return port;
   const parsed = parseInt(value, 10);
   if (isNaN(parsed) || parsed <= 0) {
     throw new Error(`Invalid PORT "${value}". Must be a positive integer.`);
@@ -68,14 +73,12 @@ export function validateConfig(): void {
     errors.push('PORT must be a positive number.');
   }
 
-  if (!allowedDatabaseTypes.includes(config.DATABASE_TYPE)) {
-    errors.push(`DATABASE_TYPE must be one of: ${allowedDatabaseTypes.join(', ')}.`);
-  }
-
   if (config.DATABASE_TYPE !== 'memory' && !config.DATABASE_URL) {
     errors.push(`DATABASE_URL is required when DATABASE_TYPE is ${config.DATABASE_TYPE}.`);
   }
 
+  if (config.DATABASE_TYPE === 'mongo' && !config.MONGO_DB) {
+    errors.push('MONGO_DB is required when DATABASE_TYPE is mongo.');
   if (config.NODE_ENV === 'production' && config.DATABASE_TYPE === 'mongo' && !process.env.MONGO_DB) {
     errors.push('MONGO_DB must be explicitly set in production when DATABASE_TYPE is mongo.');
   }
