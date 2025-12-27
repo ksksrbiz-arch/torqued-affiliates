@@ -6,9 +6,6 @@ describe('config validation', () => {
   let consoleWarnSpy: any;
   let consoleErrorSpy: any;
 
-describe('config validation', () => {
-  let originalEnv: NodeJS.ProcessEnv;
-
   beforeEach(() => {
     // Save original environment
     originalEnv = { ...process.env };
