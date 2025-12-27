@@ -10,7 +10,11 @@ Vercel builds the project using its **buildpack-style Node.js build pipeline** (
 
 ## CI/CD (GitHub Actions)
 
-Deployments run automatically on every push to `main` via the workflow in `.github/workflows/deploy.yml`.
+Deployments run automatically on every push to `main` via the workflow in `.github/workflows/deploy.yml`. The workflow ensures successful completion by:
+
+1. Building the project (`npm run build`)
+2. Running tests (`npm test`)
+3. Deploying to Vercel only if build and tests pass
 
 ### Required GitHub Secrets
 
