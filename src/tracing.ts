@@ -15,16 +15,14 @@ const sdk = new NodeSDK({
   instrumentations: [getNodeAutoInstrumentations()]
 });
 
-sdk
-  .start()
-  .then(() => console.info('OpenTelemetry SDK started — exporting to', endpoint))
-  .catch((err) => console.error('Error starting OpenTelemetry SDK', err));
+sdk.start();
+console.info('OpenTelemetry SDK started — exporting to', endpoint);
 
 // Graceful shutdown on termination signals
 process.on('SIGTERM', () => {
   sdk.shutdown()
     .then(() => console.info('OpenTelemetry SDK shutdown complete'))
-    .catch((err) => console.error('OpenTelemetry SDK shutdown error', err))
+    .catch((err: unknown) => console.error('OpenTelemetry SDK shutdown error', err))
     .finally(() => process.exit(0));
 });
 
