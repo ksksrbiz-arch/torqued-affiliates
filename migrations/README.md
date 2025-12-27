@@ -1,5 +1,5 @@
 # Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
-# This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
+# This software is proprietary, copyrighted, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
 # Database Migrations
 
 Place PostgreSQL migration files here (for example `001_init.sql`, `002_add_affiliate_columns.sql`).

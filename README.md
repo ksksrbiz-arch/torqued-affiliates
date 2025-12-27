@@ -37,6 +37,7 @@ What's included
 - Basic tests and CI workflow
 - docs/branch-sync.md — instructions for syncing branches from an existing repo into this new repo
 - docs/shopify-integration.md — tips for connecting a Shopify-hosted frontend to this backend
+- docs/deployment.md — comprehensive guide for CI/CD pipeline and production deployment
 
 Data storage and migrations
 
@@ -53,7 +54,7 @@ Secrets management
 
 Next steps
 
-- Implement persistent storage (Postgres, MongoDB or another store)
+- Extend PostgreSQL-based persistent storage (schemas, indices, and migrations)
 - Add real authentication and permissions
 - Add billing / webhooks verification for Shopify
 

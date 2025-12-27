@@ -46,6 +46,11 @@ function parsePort(value: string | undefined): number {
     throw new Error(`Invalid PORT "${value}". Must be a numeric value.`);
   }
   return port;
+  const parsed = parseInt(value, 10);
+  if (isNaN(parsed) || parsed <= 0) {
+    throw new Error(`Invalid PORT "${value}". Must be a positive integer.`);
+  }
+  return parsed;
 }
 
 export const config = {
@@ -74,6 +79,8 @@ export function validateConfig(): void {
 
   if (config.DATABASE_TYPE === 'mongo' && !config.MONGO_DB) {
     errors.push('MONGO_DB is required when DATABASE_TYPE is mongo.');
+  if (config.NODE_ENV === 'production' && config.DATABASE_TYPE === 'mongo' && !process.env.MONGO_DB) {
+    errors.push('MONGO_DB must be explicitly set in production when DATABASE_TYPE is mongo.');
   }
 
   if (config.NODE_ENV === 'production' && config.APP_SECRET === 'dev-secret') {
