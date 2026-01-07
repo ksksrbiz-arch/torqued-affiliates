@@ -84,7 +84,7 @@ Runs on every push and pull request:
 3. **Lint** - Code quality checks (if configured)
 
 **Trigger:** All pushes and pull requests  
-**Node Version:** 18.x  
+**Node Version:** 20.x  
 **Status:** Must pass before merging to main
 
 ### Security Workflow (`.github/workflows/security.yml`)
@@ -212,7 +212,7 @@ az webapp create \
   --name torqued-affiliates \
   --resource-group torqued-rg \
   --plan torqued-plan \
-  --runtime "NODE:18-lts"
+  --runtime "NODE:20-lts"
 
 # Configure environment variables
 az webapp config appsettings set \
@@ -251,7 +251,7 @@ vercel --prod
 pip install awsebcli
 
 # Initialize EB application
-eb init -p node.js-18 torqued-affiliates
+eb init -p node.js-20 torqued-affiliates
 
 # Create environment
 eb create production-env \
@@ -265,7 +265,7 @@ eb deploy
 ### 3. Traditional Server Deployment
 
 **Prerequisites:**
-- Node.js 18.x or later
+- Node.js 20.x or later
 - PostgreSQL 15+ (or MongoDB 7+)
 - PM2 or similar process manager
 
