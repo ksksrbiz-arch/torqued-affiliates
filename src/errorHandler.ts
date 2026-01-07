@@ -1,8 +1,11 @@
 // Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
 // This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
-import { Request, Response, NextFunction } from 'express';
+import { FastifyInstance } from 'fastify';
 
-export function errorHandler(err: any, _req: Request, res: Response, _next: NextFunction) {
-  console.error(err);
-  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
+export function registerErrorHandler(app: FastifyInstance): void {
+  app.setErrorHandler((err, _req, reply) => {
+    const statusCode = err.statusCode ?? 500;
+    app.log.error({ err }, 'request error');
+    reply.status(statusCode).send({ error: err.message || 'Internal Server Error' });
+  });
 }

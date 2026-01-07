@@ -1,39 +1,53 @@
 // Copyright (c) 2025 Keith John Skaggs Jr. All rights reserved.
 // This software is proprietary, copywritten, and strictly licensed. Unauthorized use is prohibited and will be prosecuted.
-import { Router, Request } from 'express';
+import { FastifyPluginAsync } from 'fastify';
 import { verifyShopifyWebhook, getWebhookTopic } from '../services/shopifyService';
 
-const router = Router();
+const webhooksRoutes: FastifyPluginAsync = async (fastify) => {
+  // NOTE: For proper HMAC verification you must read the raw request body bytes.
+  // `request.rawBody` is added by the @fastify/raw-body plugin in `src/app.ts`.
+  fastify.post(
+    '/shopify',
+    {
+      schema: {
+        body: {
+          type: 'object',
+          additionalProperties: true
+        },
+        response: {
+          200: { type: 'string' },
+          401: { type: 'string' },
+          500: { type: 'string' }
+        }
+      }
+    },
+    async (request, reply) => {
+      try {
+        // Header set by Shopify
+        const hmac = request.headers['x-shopify-hmac-sha256'] as string | undefined;
+        // For local development - fallback if no secret configured
+        const secret = process.env.SHOPIFY_API_SECRET || '';
 
-// NOTE: For proper HMAC verification you must read the raw request body bytes.
-// In production configure Express to expose raw body (see body-parser raw) or verify using middleware that
-// preserves the raw bytes.
-router.post('/shopify', (req: Request, res) => {
-  try {
-    // Header set by Shopify
-    const hmac = req.headers['x-shopify-hmac-sha256'] as string | undefined;
-    // For local development - fallback if no secret configured
-    const secret = process.env.SHOPIFY_API_SECRET || '';
+        const raw = Buffer.isBuffer(request.rawBody)
+          ? request.rawBody
+          : Buffer.from(JSON.stringify(request.body ?? {}));
 
-    // Use the raw bytes captured by bodyParser.verify so verification matches Shopify's HMAC.
-    // `req.rawBody` is set by the `bodyParser.verify` middleware in `src/app.ts`.
-    // Fallback to stringified body if rawBody isn't present (useful for tests / dev).
-    // Prefer the raw buffer when available.
-    const raw = (req as any).rawBody instanceof Buffer ? (req as any).rawBody : Buffer.from(JSON.stringify(req.body));
+        if (!secret || !verifyShopifyWebhook(raw, hmac, secret)) {
+          request.log.warn('Shopify webhook verification failed');
+          reply.code(401).send('invalid signature');
+          return;
+        }
 
-    if (!secret || !verifyShopifyWebhook(raw, hmac, secret)) {
-      console.warn('Shopify webhook verification failed');
-      return res.status(401).send('invalid signature');
+        const topic = getWebhookTopic(request.headers);
+        request.log.info({ topic }, 'Verified webhook');
+        // TODO: queue or process the webhook here
+        reply.code(200).send('ok');
+      } catch (err) {
+        request.log.error({ err }, 'Error verifying webhook');
+        reply.code(500).send('error');
+      }
     }
+  );
+};
 
-    const topic = getWebhookTopic(req.headers);
-    console.log('Verified webhook:', topic);
-    // TODO: queue or process the webhook here
-    return res.status(200).send('ok');
-  } catch (err) {
-    console.error('Error verifying webhook', err);
-    return res.status(500).send('error');
-  }
-});
-
-export default router;
+export default webhooksRoutes;
